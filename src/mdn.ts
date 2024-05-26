@@ -30,16 +30,15 @@ type Result = ReturnType<typeof formatForAlfred>;
 async function getMdnSearchResult(searchWord: string): Promise<Result[]> {
   const res = await fetchMDN(searchWord);
   const documents = extractDocs(res);
-  const items = documents.map((doc) => formatForAlfred(doc, DOC_BASE_URL));
+  const items = documents.map((doc) => formatForAlfred(doc));
   return items;
 }
 
 async function fetchMDN(
   query: string,
   locale: string = LOCALE,
-  baseUrl: string = API_URL,
 ): Promise<searchResults> {
-  const res = await fetch(buildSearchURL(query, locale, baseUrl));
+  const res = await fetch(buildSearchURL(query, locale));
   if (!res.ok) {
     throw new Error(
       `${res.status}:${res.statusText} Failed to fetch data from MDN API.`,
@@ -55,23 +54,27 @@ function extractDocs(data: searchResults) {
   return documents;
 }
 
-function buildSearchURL(query: string, locale: string, baseUrl: string) {
-  const url = new URL(baseUrl);
+function buildSearchURL(
+  query: string,
+  locale: string,
+  apiEndpoint: string = API_URL,
+) {
+  const url = new URL(apiEndpoint);
   url.searchParams.set("q", query);
   url.searchParams.set("locale", locale);
   url.searchParams.set("sort", "best");
   return url;
 }
 
-function buildArticleURL(articlePath: string, baseURL: string) {
+function buildArticleURL(articlePath: string, baseURL: string = DOC_BASE_URL) {
   const articleURL = new URL(baseURL);
   articleURL.pathname = articlePath;
   return articleURL.href;
 }
 
-function formatForAlfred(item: Item, baseUrl: string) {
+function formatForAlfred(item: Item, baseURL: string = DOC_BASE_URL) {
   const { title, summary, mdn_url } = item;
-  const articleURL = buildArticleURL(mdn_url, baseUrl);
+  const articleURL = buildArticleURL(mdn_url, baseURL);
   const subtitle = summary.trim();
   return {
     title,
