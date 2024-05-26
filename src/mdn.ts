@@ -25,21 +25,21 @@ const searchResultsSchema = z.object({
 type searchResults = z.infer<typeof searchResultsSchema>;
 type Item = z.infer<typeof itemSchema>;
 type Highlight = z.infer<typeof highlightSchema>;
-type Result = ReturnType<typeof createAlfredData>;
+type Result = ReturnType<typeof formatForAlfred>;
 
 async function getMdnSearchResult(searchWord: string): Promise<Result[]> {
-  const res = await fetcher(searchWord);
-  const documents = filterData(res);
-  const items = documents.map((doc) => createAlfredData(doc, DOC_BASE_URL));
+  const res = await fetchMDN(searchWord);
+  const documents = extractDocs(res);
+  const items = documents.map((doc) => formatForAlfred(doc, DOC_BASE_URL));
   return items;
 }
 
-async function fetcher(
+async function fetchMDN(
   query: string,
   locale: string = LOCALE,
   baseUrl: string = API_URL,
 ): Promise<searchResults> {
-  const res = await fetch(createSearchURL(query, locale, baseUrl));
+  const res = await fetch(buildSearchURL(query, locale, baseUrl));
   if (!res.ok) {
     throw new Error(
       `${res.status}:${res.statusText} Failed to fetch data from MDN API.`,
@@ -50,12 +50,12 @@ async function fetcher(
   return searchResults;
 }
 
-function filterData(data: searchResults) {
+function extractDocs(data: searchResults) {
   const { documents } = data;
   return documents;
 }
 
-function createSearchURL(query: string, locale: string, baseUrl: string) {
+function buildSearchURL(query: string, locale: string, baseUrl: string) {
   const url = new URL(baseUrl);
   url.searchParams.set("q", query);
   url.searchParams.set("locale", locale);
@@ -63,15 +63,15 @@ function createSearchURL(query: string, locale: string, baseUrl: string) {
   return url;
 }
 
-function createArticleURL(articlePath: string, baseURL: string) {
+function buildArticleURL(articlePath: string, baseURL: string) {
   const articleURL = new URL(baseURL);
   articleURL.pathname = articlePath;
   return articleURL.href;
 }
 
-function createAlfredData(item: Item, baseUrl: string) {
+function formatForAlfred(item: Item, baseUrl: string) {
   const { title, summary, mdn_url } = item;
-  const articleURL = createArticleURL(mdn_url, baseUrl);
+  const articleURL = buildArticleURL(mdn_url, baseUrl);
   const subtitle = summary.trim();
   return {
     title,
