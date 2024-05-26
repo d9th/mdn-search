@@ -76,7 +76,7 @@ function formatForAlfred(item: Item, baseUrl: string) {
   return {
     title,
     arg: articleURL,
-    subtitle: subtitle,
+    subtitle,
     quicklookurl: articleURL,
     text: {
       copy: articleURL,
