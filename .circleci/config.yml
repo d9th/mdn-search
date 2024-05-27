@@ -1,0 +1,16 @@
+version: 2.1
+jobs:
+  build-and-test:
+    docker:
+      - image: denoland/deno:1.43.6
+    steps:
+      - checkout
+      - run: |
+          mkdir -p result
+          deno test --junit-path=result/result.xml
+      - store_test_results:
+          path: result
+workflows:
+  say-hello-workflow:
+    jobs:
+      - build-and-test

@@ -8,7 +8,13 @@
     "editor.formatOnSave": true,
   },
   "cSpell.words": [
+    "cimg",
+    "deno",
+    "denoland",
     "largetype",
     "quicklookurl"
+  ],
+  "circleci.persistedProjectSelection": [
+    "gh/d9th/mdn-search"
   ],
 }
