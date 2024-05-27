@@ -1,22 +1,16 @@
 version: 2.1
 jobs:
-  say-hello:
-    docker:
-      - image: cimg/base:current
-    steps:
-      - checkout
-      - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
   build-and-test:
     docker:
       - image: denoland/deno:1.43.6
     steps:
       - checkout
       - run: |
-          deno test
+          mkdir -p result
+          deno test --junit-path=result/result.xml
+      - store_test_results:
+          path: result
 workflows:
   say-hello-workflow:
     jobs:
-      - say-hello
       - build-and-test
