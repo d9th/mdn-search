@@ -6,11 +6,23 @@ jobs:
     steps:
       - checkout
       - run: |
+          mkdir -p ~/.cache/deno
+          deno --version
+      - restore_cache:
+          name: Restore Deno cache
+          keys:
+            - deno-packages-{{ checksum "deno.lock" }}
+      - run: |
           mkdir -p result
           deno test --junit-path=result/result.xml
       - store_test_results:
           path: result
+      - save_cache:
+          name: Save Deno package cache
+          paths:
+            - "~/.cache/deno"
+          key: deno-packages-{{ checksum "deno.lock"}}
 workflows:
-  say-hello-workflow:
+  example-workflow:
     jobs:
       - build-and-test
