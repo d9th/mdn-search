@@ -28,7 +28,7 @@ jobs:
       - run:
           name: "restore workspace data"
           command: |
-            ls -lR tmp
+            ls -lR .
       - run:
           name: "check workspace data"
           command: cat tmp/data/output.txt
