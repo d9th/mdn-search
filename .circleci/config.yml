@@ -5,10 +5,39 @@ jobs:
       - image: denoland/deno:1.43.6
     steps:
       - checkout
-      - run: |
-          echo foo > foo.txt
+      - run:
+          name: "Create sample data"
+          command: |
+            mkdir -p tmp/data
+            echo message from build-a | tee tmp/data/output.txt
+      - run:
+          name: "List contents of tmp dir"
+          command: |
+            ls -lR
+      - persist_to_workspace:
+          root: tmp
+          paths:
+            - data
+  build-b:
+    docker:
+      - image: denoland/deno:1.43.6
+    steps:
+      - attach_workspace:
+          name: "Attach workspace"
+          at: tmp
+      - run:
+          name: "restore workspace data"
+          command: |
+            ls -lR tmp
+      - run:
+          name: "check workspace data"
+          command: cat tmp/data/output.txt
 
 workflows:
   example-workflow:
     jobs:
       - build-a
+      - build-b:
+          requires:
+            - build-a
+
