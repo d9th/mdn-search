@@ -1,8 +1,12 @@
 version: 2.1
-jobs:
-  build-a:
+
+executors:
+  deno-executor:
     docker:
       - image: denoland/deno:1.43.6
+jobs:
+  build-a:
+    executor: deno-executor
     steps:
       - checkout
       - run:
@@ -19,8 +23,7 @@ jobs:
           paths:
             - data
   build-b:
-    docker:
-      - image: denoland/deno:1.43.6
+    executor: deno-executor
     steps:
       - attach_workspace:
           name: "Attach workspace"
